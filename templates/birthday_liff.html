@@ -209,7 +209,7 @@
       scrollbar-width: none;
     }
     .tab-scroll::-webkit-scrollbar { display: none; }
-    .tab-bar { display: flex; gap: 8px; width: max-content; }
+    .tab-bar { display: flex; gap: 8px; width: max-content; padding-right: 16px; }
     .tab-btn {
       height: 40px;
       padding: 0 16px;
@@ -244,6 +244,7 @@
       flex-direction: column;
       gap: 32px;
       width: max-content;
+      padding-right: 16px;
     }
     .carousel-row { display: flex; gap: 8px; }
 
@@ -252,12 +253,14 @@
     .card-img-wrap {
       width: 93px;
       height: 93px;
-      background: transparent;
+      background: #F5F5F5;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 8px;
+      overflow: hidden;
     }
-    .card-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+    .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
     .card-info {
       padding-top: 8px;
       display: flex;
@@ -278,9 +281,8 @@
       color: #616161;
       line-height: 1.3;
       overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
     .card-price {
       font-size: 14px;
@@ -553,6 +555,9 @@
     };
     let sections = SECTIONS_I18N[lang];
 
+    // s1 탭별 상품 데이터 (key: 탭 인덱스)
+    const TAB_PRODUCTS = { 0: [], 1: [], 2: [] };
+
     const products = [
       { brand: 'AVEDA',         name: '우드 헤어 브러쉬',     price: '$120', img: '' },
       { brand: 'Starbucks',     name: '텀블러 세트',           price: '$180', img: '' },
@@ -608,51 +613,124 @@
       return T.currencyPrefix + formatted + T.currencySuffix;
     }
 
+    // ── 상품 상세 페이지 열기 ────────────────────────────────────────────
+    function openProduct(shopUrl, id) {
+      const url = `https://giftshop-tw.line.me/voucher/${id}`;
+      if (typeof liff !== 'undefined' && liff.isInClient()) {
+        liff.openWindow({ url, external: false });
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+
+    // ── 상품명에서 브랜드명 제거 ──────────────────────────────────────────
+    function cleanProductName(name, brand) {
+      if (!brand) return name;
+      const esc = brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      let cleaned = name
+        .replace(new RegExp('【[^】]*' + esc + '[^】]*】', 'gi'), '')
+        .replace(new RegExp(esc, 'gi'), '')
+        .replace(/【】/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+      return cleaned || name;
+    }
+
     // ── 카드 HTML ───────────────────────────────────────────────────────
     function cardHTML(p) {
+      const clickable = p.shopUrl && p.id;
+      const displayName = cleanProductName(p.name, p.brand);
       return `
-        <div class="card">
+        <div class="card" ${clickable ? `onclick="openProduct('${p.shopUrl}',${p.id})"` : ''}>
           <div class="card-img-wrap">
             ${p.img ? `<img src="${p.img}" alt="${p.name}">` : ''}
           </div>
           <div class="card-info">
             <p class="card-brand">${p.brand}</p>
-            <p class="card-name">${p.name}</p>
+            <p class="card-name">${displayName}</p>
             <p class="card-price">${formatPrice(p.price)}</p>
           </div>
         </div>`;
     }
 
-    // ── 섹션 렌더링 ─────────────────────────────────────────────────────
-    function renderSections() {
-      const row1 = products.map(cardHTML).join('');
-      const row2 = [...products].reverse().map(cardHTML).join('');
-      const carousel = `
+    // ── 빈 카드 (레이아웃 유지용) ─────────────────────────────────────
+    function emptyCardHTML() {
+      return `
+        <div class="card">
+          <div class="card-img-wrap skel"></div>
+          <div class="card-info">
+            <div class="skel skel-line" style="width:60px"></div>
+            <div class="skel skel-line" style="width:80px;margin-top:6px"></div>
+            <div class="skel skel-line" style="width:40px;margin-top:6px"></div>
+          </div>
+        </div>`;
+    }
+
+    // ── 캐러셀 빌드 ─────────────────────────────────────────────────────
+    // 탭당 카드 8개 × (카드 93px + 간격 8px)
+    const TAB_WIDTH = 8 * (93 + 8);
+
+    // ── 캐러셀 빌드 (모든 탭 연속 배치) ─────────────────────────────────
+    function buildCarousel(tabProdsArray) {
+      let row1 = '', row2 = '';
+      for (const prods of tabProdsArray) {
+        for (let i = 0; i < 8; i++)  row1 += (prods[i]  ? cardHTML(prods[i])  : emptyCardHTML());
+        for (let i = 8; i < 16; i++) row2 += (prods[i]  ? cardHTML(prods[i])  : emptyCardHTML());
+      }
+      return `
         <div class="carousel-outer">
           <div class="carousel-rows">
             <div class="carousel-row">${row1}</div>
             <div class="carousel-row">${row2}</div>
           </div>
         </div>`;
-
-      document.getElementById('priceSections').innerHTML = sections.map(s => `
-        <div class="price-section">
-          <p class="section-title">${s.title}</p>
-          <div class="tab-scroll">
-            <div class="tab-bar">
-              ${s.tabs.map((t, i) => `
-                <button class="tab-btn ${i === 0 ? 'active' : ''}" onclick="switchTab(this)">${t}</button>
-              `).join('')}
-            </div>
-          </div>
-          ${carousel}
-        </div>
-      `).join('');
     }
 
-    function switchTab(btn) {
+    // ── 섹션 렌더링 ─────────────────────────────────────────────────────
+    function renderSections() {
+      document.getElementById('priceSections').innerHTML = sections.map((s, si) => {
+        const tabProdsArray = s.tabs.map((_, ti) => si === 0 ? (TAB_PRODUCTS[ti] || []) : []);
+        return `
+          <div class="price-section">
+            <p class="section-title">${s.title}</p>
+            <div class="tab-scroll">
+              <div class="tab-bar">
+                ${s.tabs.map((t, i) => `
+                  <button class="tab-btn ${i === 0 ? 'active' : ''}" onclick="switchTab(this,${i})">${t}</button>
+                `).join('')}
+              </div>
+            </div>
+            ${buildCarousel(tabProdsArray)}
+          </div>`;
+      }).join('');
+
+      // 스크롤 위치에 따라 탭 자동 업데이트 (인덱스 변경 시에만)
+      document.querySelectorAll('.carousel-outer').forEach(carousel => {
+        const tabBtns = carousel.closest('.price-section').querySelectorAll('.tab-btn');
+        let lastIdx = 0;
+        carousel.addEventListener('scroll', () => {
+          const idx = Math.min(Math.round(carousel.scrollLeft / TAB_WIDTH), tabBtns.length - 1);
+          if (idx === lastIdx) return;
+          lastIdx = idx;
+          tabBtns.forEach((b, i) => b.classList.toggle('active', i === idx));
+          centerTab(tabBtns[idx]);
+        }, { passive: true });
+      });
+    }
+
+    // 활성 탭을 탭바 중앙으로 이동
+    function centerTab(btn) {
+      const tabScroll = btn.closest('.tab-scroll');
+      const scrollLeft = btn.offsetLeft - (tabScroll.clientWidth / 2) + (btn.offsetWidth / 2);
+      tabScroll.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+
+    function switchTab(btn, tabIdx) {
       btn.closest('.price-section').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      centerTab(btn);
+      btn.closest('.price-section').querySelector('.carousel-outer')
+        .scrollTo({ left: tabIdx * TAB_WIDTH, behavior: 'smooth' });
     }
 
     // ── 이름 말줄임 ──────────────────────────────────────────────────────
@@ -765,17 +843,19 @@
       closeFriendSheet();
     }
 
-    // ── 상품 데이터 로드 (top16.json) ────────────────────────────────────
+    // ── 상품 데이터 로드 ────────────────────────────────────────────────
     async function loadProducts() {
-      try {
-        const res = await fetch('/static/data/top16.json');
-        const data = await res.json();
-        if (data.products && data.products.length) {
-          products.splice(0, products.length, ...data.products);
-        }
-      } catch (e) {
-        console.warn('products load failed, using placeholder', e);
-      }
+      const loads = [
+        fetch('/static/data/top16_cake.json').then(r => r.json()).catch(() => null),
+        fetch('/static/data/top16_coffee.json').then(r => r.json()).catch(() => null),
+        fetch('/static/data/top16_beauty.json').then(r => r.json()).catch(() => null),
+      ];
+      const [cake, coffee, beauty] = await Promise.all(loads);
+      if (cake?.products?.length)   TAB_PRODUCTS[0].push(...cake.products);
+      if (coffee?.products?.length) TAB_PRODUCTS[1].push(...coffee.products);
+      if (beauty?.products?.length) TAB_PRODUCTS[2].push(...beauty.products);
+      // products 배열은 기본 탭(케이크) 기준
+      if (TAB_PRODUCTS[0].length) products.splice(0, products.length, ...TAB_PRODUCTS[0]);
     }
 
     // ── LIFF 초기화 ─────────────────────────────────────────────────────

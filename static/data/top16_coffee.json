@@ -1,0 +1,182 @@
+{
+  "generatedAt": "2026-03-05T09:44:32Z",
+  "trendKeywords": [],
+  "products": [
+    {
+      "id": 322423134,
+      "brand": "星巴克",
+      "name": "【星巴克】175元星享飲料券",
+      "price": "$175",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hAR1T291HHn0MLQE0iuRhKlxwEgw_XBp1ZVUDQCguPzRRHyZwQxMuGG8tEwZBQQtgMAsDbkFxFTghRyJ0VEMtfXcsKytzHAkoeQAtGVZyPD9KXDhOQA",
+      "shopUrl": "systex3",
+      "lineScore": 100.0,
+      "trendsScore": 0.0,
+      "totalScore": 60.0
+    },
+    {
+      "id": 322458142,
+      "brand": "星巴克",
+      "name": "【星巴克】你是最特別的人組合",
+      "price": "$260",
+      "img": "https://lcp-prod-obs.line-scdn.net/0h1I2fuNM3bmYPH3EBh0wRMV5CYhc8bmpuZmdzWytaTy9BcHszTDFKdVEeWApnb1JvT3FxX1ocSwlCJ0JCWHlAZV1eYiNJLnpVbjhKS0lFTCNSc3lVMj8",
+      "shopUrl": "systex3",
+      "lineScore": 63.68,
+      "trendsScore": 0.0,
+      "totalScore": 38.21
+    },
+    {
+      "id": 322423912,
+      "brand": "星巴克",
+      "name": "【星巴克】生日快樂雙人分享組合",
+      "price": "$400",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hx49STVCnJxsEKjnUOfBYTFV3K2o3WyMTbVI6JiAoK3BwUTM7OBAWCFpyLF1NGxsSREQ4IlEpAnRJEgs_U0wJGFZrBShsUh8RMUwUCEJjEmBZRjAoOQo",
+      "shopUrl": "systex3",
+      "lineScore": 46.37,
+      "trendsScore": 0.0,
+      "totalScore": 27.82
+    },
+    {
+      "id": 322433023,
+      "brand": "7-ELEVEN",
+      "name": "[心意禮]【7-ELEVEN】 熱卡布奇諾咖啡(大)好禮即享券(1杯$34/1組$272，最低購買8杯)",
+      "price": "$55",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hqOEN8ygzLmB4NzF8VblRNylqIhFLRipoEU8zXVxyDFIqXDxpMFQeBDl-I1M1AxJpOFkxWS00Cw81DwJEL1EAYyp3Iws2QTtpLw0yTT18DCUlWzlTRRc",
+      "shopUrl": "edenred",
+      "lineScore": 27.05,
+      "trendsScore": 0.0,
+      "totalScore": 16.23
+    },
+    {
+      "id": 322433022,
+      "brand": "7-ELEVEN",
+      "name": "[心意禮]【7-ELEVEN】 冰濃萃美式咖啡(特大)好禮即享券(1杯$41/1組$328，最低購買8杯)",
+      "price": "$65",
+      "img": "https://lcp-prod-obs.line-scdn.net/0h-_EQCoh2cnB4KG1sVfENJyl1fgFLWXZ4EVBvTVxhfBwyU0p6Gk1BTTooUiUMXE55OEZtSS0rVx81EF5UL05ccypofxs2XmVPIxZtXSJzRwslRGVDRQg",
+      "shopUrl": "edenred",
+      "lineScore": 11.97,
+      "trendsScore": 0.0,
+      "totalScore": 7.18
+    },
+    {
+      "id": 322461435,
+      "brand": "7-ELEVEN",
+      "name": "[週一打氣限定]【7-ELEVEN】 熱精品美式咖啡(大)(1杯$50/1組$100，最低購買2杯)",
+      "price": "$100",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hYF8fYY7rBmkFHxmTZA15PlZCChg2bgJhbGcbVCFaJyxxdBI9XjIaDCBUJD9pdxN3UjIoaWFZJwFDLiBZWSUcaiFWCAZDcBJjbHk2DVwfJ1p6aTpjY3E1fw",
+      "shopUrl": "edenred",
+      "lineScore": 9.09,
+      "trendsScore": 0.0,
+      "totalScore": 5.45
+    },
+    {
+      "id": 322335205,
+      "brand": "路易莎咖啡",
+      "name": "HBD 生日快樂【路易莎咖啡】午後療癒組組合 (中杯小農雪點鮮奶茶+ 55元(含)以下蛋糕)",
+      "price": "$125",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hkF7DzbHVNGkKPStV50BLPltgOBg5TDBhY0UpVC52OgJfRQw8Sl4HVERgFlpuVwhgSlMrUF8-EQZHBRhNXVsaalh9AQVyTiBZNhoQRE85ARJXUSNaNx0",
+      "shopUrl": "12cmxevent",
+      "lineScore": 6.44,
+      "trendsScore": 0.0,
+      "totalScore": 3.87
+    },
+    {
+      "id": 322411676,
+      "brand": "85度C",
+      "name": "【85度C】 149元午茶組好禮即享券(50元飲品+99元蛋糕)",
+      "price": "$149",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hcOBdg77ePGB_HSOLaMpDNy5AMBFMbDhoFmUhXVtYCg8lcy5pPCAPBR9EMDUiKQBpP3MjWSoeGQ8yJRBEKHsSYy1dMAsPdyhAQzkhTToZHiUicStTQj0",
+      "shopUrl": "edenred",
+      "lineScore": 4.13,
+      "trendsScore": 0.0,
+      "totalScore": 2.48
+    },
+    {
+      "id": 322324453,
+      "brand": "85度C",
+      "name": "[生日快樂]【 85度C】 125元午茶好禮即享券(50元飲品+75元蛋糕)",
+      "price": "$125",
+      "img": "https://lcp-prod-obs.line-scdn.net/0h39yd8gZZbBZEHXNDJNQTQRVAYGd3bGgeLWVxK2AdWSUSLVc1BDNLOwJUZ3oJLFAfBHNzLxEeSXkJJUAyE3tCFRZdTUAWZHkbGzlzOx5FTlMZcXsleT0",
+      "shopUrl": "edenred",
+      "lineScore": 3.98,
+      "trendsScore": 0.0,
+      "totalScore": 2.39
+    },
+    {
+      "id": 322324511,
+      "brand": "85度C",
+      "name": "【85度C】108元午茶組(50元飲料+58元蛋糕)好禮即享券",
+      "price": "$108",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hbQttp4RlPX5JDSKVX2lCKRhQMQ96fDl2IHUgQ21IMU1tORFjEjYgbRNUH005ZAF3CWMiRxwOGBEENRFaHmsTfRtNMRU5YBJ0HmggUw9KCAUUYSpNdC0",
+      "shopUrl": "edenred",
+      "lineScore": 3.35,
+      "trendsScore": 0.0,
+      "totalScore": 2.01
+    },
+    {
+      "id": 322135207,
+      "brand": "全家便利商店",
+      "name": "【全家】大杯冰拿鐵",
+      "price": "$55",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hVdX4gz0TCUtlTRmiJMt2HDYQBTpWPA1DDDUUdkEIKA03OR0eJmo6S0gUKB4_NRxvMmAnSwELKCMjfC97OXcTSEEEPB47JB50LSo5RDwGKR44OzVBAyM6XQ",
+      "shopUrl": "edenred",
+      "lineScore": 3.18,
+      "trendsScore": 0.0,
+      "totalScore": 1.91
+    },
+    {
+      "id": 322351650,
+      "brand": "麥當勞",
+      "name": "[麥當勞·期間限定麥心意]【麥當勞】冰經典美式咖啡x2 好禮即享券 (買一送一)",
+      "price": "$100",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hnptMzMnDMV9JNC9Bp45OCBppPS56RTVXIEwsYm1xEBlgBSZSAVYsZTZyEAYMTCZ7HhkfXy1yEDcPBRdvFQ4rXG19PxlsXAl_CVYVZRA1EQk2Qg1VL1oCSQ",
+      "shopUrl": "edenred",
+      "lineScore": 2.26,
+      "trendsScore": 0.0,
+      "totalScore": 1.36
+    },
+    {
+      "id": 322308694,
+      "brand": "迷客夏",
+      "name": "【迷客夏】友誼不散組合 喜客券",
+      "price": "$130",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hMfZ42l1mEklnTQKG9SNtHjQQHjhUPBZBDjUPdEMIMyU-OwVUJHEOSjILJB9PeD1HMGA8SQMLMyEhfDR5O3cISkMEJxwhOipUASkNSiIGMh8YOy5DASMhXw",
+      "shopUrl": "systex2",
+      "lineScore": 2.02,
+      "trendsScore": 0.0,
+      "totalScore": 1.21
+    },
+    {
+      "id": 322135157,
+      "brand": "全家便利商店",
+      "name": "【全家】大杯熱拿鐵",
+      "price": "$55",
+      "img": "https://lcp-prod-obs.line-scdn.net/0h9QvF8w4GZn5LP3aXCroZKRhiag94TmJ2Ikd7Q296RBJuUF4rLV1VRDw8RBEdVUpKHBJIfi95RxYNDkBOFwV8fW92UysVVnFBA1h8bTh0RisWSVp0LVFVaA",
+      "shopUrl": "edenred",
+      "lineScore": 1.94,
+      "trendsScore": 0.0,
+      "totalScore": 1.16
+    },
+    {
+      "id": 322135137,
+      "brand": "全家便利商店",
+      "name": "【全家】中杯冰美式咖啡",
+      "price": "$35",
+      "img": "https://lcp-prod-obs.line-scdn.net/0han7xGyd9PkEKAS6oS4JBFllcMjA5cDpJY3kjfC5EHBdbMStcVSEOUkRJHBd1eAZ1XSwQQW5HHylMMBhxVjskQi5ICxRUaCl-QT0NUk9KHhRXdwJLbG8NVw",
+      "shopUrl": "edenred",
+      "lineScore": 1.77,
+      "trendsScore": 0.0,
+      "totalScore": 1.06
+    },
+    {
+      "id": 322414586,
+      "brand": "路易莎咖啡",
+      "name": "[生日快樂]【路易莎咖啡】生日快樂組合(中杯莊園美式+ $70元(含)之蛋糕)",
+      "price": "$140",
+      "img": "https://lcp-prod-obs.line-scdn.net/0hmsd96GFzMlxZQC1MTAhNCwodPi1qMTZUMDgvYX0FExkDcSdRMH8WZgsGPBkAOCVSDm0cXD0GEzQfcRRsBXooX30JPDB1cAtsHn4oZgBAEAomNg5WPy4BSg",
+      "shopUrl": "12cmxevent",
+      "lineScore": 1.49,
+      "trendsScore": 0.0,
+      "totalScore": 0.89
+    }
+  ]
+}
