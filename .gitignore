@@ -1,0 +1,27 @@
+# 환경변수
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# 로그
+*.log
+
+# 캐시 (멤버 개인정보 포함)
+group_members_cache.json
+
+# Claude Code 로컬 설정
+.claude/

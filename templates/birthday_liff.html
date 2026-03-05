@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Birthday Gift</title>
+  <script>
+    (function() {
+      var p = new URLSearchParams(location.search);
+      var hasMention = !!p.get('mention');
+      if (!hasMention) {
+        // LIFF가 파라미터를 liff.state로 감싸서 전달하는 경우 처리
+        var state = p.get('liff.state');
+        if (state) hasMention = decodeURIComponent(state).indexOf('mention=') !== -1;
+      }
+      if (hasMention) document.documentElement.classList.add('has-mention');
+    })();
+  </script>
+  <style>
+    .has-mention #profileSection { display: none; }
+    .has-mention #profileSkeleton { display: flex; }
+
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: calc(400px + 100%) 0; }
+    }
+    .skel {
+      background: linear-gradient(90deg, #F0F0F0 25%, #E4E4E4 50%, #F0F0F0 75%);
+      background-size: 400px 100%;
+      animation: shimmer 1.4s infinite linear;
+    }
+    #profileSkeleton {
+      display: none;
+      align-items: center;
+      gap: 16px;
+      padding: 0 16px;
+    }
+    .skel-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 500px;
+      flex-shrink: 0;
+    }
+    .skel-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .skel-line {
+      height: 14px;
+      border-radius: 4px;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, 'Helvetica Neue', 'Noto Sans KR', sans-serif;
+      background: rgba(0, 0, 0, 0.45);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── 바텀시트 ─────────────────────────────────────────── */
+    #sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 88vh;
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* ── 공유 헤더 (뷰 전환 시 타이틀만 변경) ────────────── */
+    #sharedHeader {
+      flex-shrink: 0;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+    .header-spacer { width: 24px; flex-shrink: 0; }
+    #headerTitle {
+      flex: 1;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111;
+      text-align: center;
+    }
+    #headerBtn {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    /* ── 뷰 컨테이너 ─────────────────────────────────────── */
+    #viewContainer {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── 선물 뷰 ──────────────────────────────────────────── */
+    .content {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-top: 20px;
+      background: #fff;
+    }
+    .content.hidden { display: none; }
+
+    /* ── Profile ────────────────────────────────────────── */
+    #profileSection { padding: 0 16px; }
+    #profileDefault {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+    }
+    #profileDefault:active { background: #f9f9f9; }
+    #profileSelected {
+      display: none;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+    }
+    #profileSelected:active { background: #f9f9f9; }
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 500px;
+      background: #F5F5F5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111;
+      line-height: 1.5;
+    }
+    .profile-name-text {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 700;
+      color: #111;
+      line-height: 1.4;
+    }
+    .change-btn {
+      height: 32px;
+      padding: 0 12px;
+      background: #F5F5F5;
+      border-radius: 500px;
+      border: none;
+      color: #303030;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    /* ── 섹션 목록 ────────────────────────────────────────── */
+    #priceSections {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 32px;
+    }
+    .price-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .section-title {
+      padding: 0 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    /* ── 탭바 ────────────────────────────────────────────── */
+    .tab-scroll {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-left: 16px;
+      scrollbar-width: none;
+    }
+    .tab-scroll::-webkit-scrollbar { display: none; }
+    .tab-bar { display: flex; gap: 8px; width: max-content; }
+    .tab-btn {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 500px;
+      border: 1px solid #E0E0E0;
+      background: #fff;
+      color: #303030;
+      font-size: 14px;
+      font-weight: 400;
+      white-space: nowrap;
+      cursor: pointer;
+      outline: none;
+    }
+    .tab-btn.active {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+      font-weight: 700;
+    }
+
+    /* ── 캐러셀 ──────────────────────────────────────────── */
+    .carousel-outer {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-left: 16px;
+      padding-bottom: 56px;
+      scrollbar-width: none;
+    }
+    .carousel-outer::-webkit-scrollbar { display: none; }
+    .carousel-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      width: max-content;
+    }
+    .carousel-row { display: flex; gap: 8px; }
+
+    /* ── 카드 ────────────────────────────────────────────── */
+    .card { width: 93px; flex-shrink: 0; cursor: pointer; }
+    .card-img-wrap {
+      width: 93px;
+      height: 93px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+    .card-info {
+      padding-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .card-brand {
+      font-size: 12px;
+      font-weight: 700;
+      color: #303030;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-name {
+      font-size: 12px;
+      font-weight: 400;
+      color: #616161;
+      line-height: 1.3;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .card-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    /* ── 친구 선택 뷰 ────────────────────────────────────── */
+    .friend-sheet {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #fff;
+      flex-direction: column;
+    }
+    .friend-sheet.show { display: flex; }
+
+    .search-wrap {
+      flex-shrink: 0;
+      padding: 12px 16px 8px;
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #F5F5F5;
+      border-radius: 500px;
+      padding: 8px 12px;
+      height: 35px;
+    }
+    .search-bar input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      color: #111;
+      outline: none;
+    }
+    .search-bar input::placeholder { color: #C8C8C8; }
+
+    .friend-list {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .friend-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 16px;
+      min-height: 66px;
+      cursor: pointer;
+    }
+    .friend-item:active { background: #f9f9f9; }
+
+    .friend-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 500px;
+      background: #E8E8E8;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      overflow: hidden;
+    }
+    .friend-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .friend-name {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 400;
+      color: #111;
+    }
+
+    .radio-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 500px;
+      border: 1.5px solid #E0E0E0;
+      background: #fff;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radio-btn.selected { border-color: #06C755; }
+    .radio-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 500px;
+      background: #06C755;
+      display: none;
+    }
+    .radio-btn.selected .radio-dot { display: block; }
+
+    .select-btn-wrap {
+      flex-shrink: 0;
+      padding: 16px 16px 0;
+      display: none;
+    }
+    .select-btn-wrap.show { display: block; }
+    .select-btn {
+      width: 100%;
+      height: 56px;
+      background: #06C755;
+      border-radius: 12px;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0 20px;
+    }
+    .select-btn-indicator { height: 34px; }
+  </style>
+</head>
+<body>
+
+  <div id="sheet">
+    <!-- 공유 헤더: 뷰 전환 시 타이틀·버튼 동작만 변경 -->
+    <div id="sharedHeader">
+      <div class="header-spacer"></div>
+      <span id="headerTitle">Birthday Gift</span>
+      <button id="headerBtn" onclick="headerBtnAction()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1L13 13M13 1L1 13" stroke="#111" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="viewContainer">
+
+      <!-- 선물 뷰 -->
+      <div class="content">
+        <div id="profileSkeleton">
+          <div class="skel skel-avatar"></div>
+          <div class="skel-lines">
+            <div class="skel skel-line" style="width:80px"></div>
+            <div class="skel skel-line" style="width:130px"></div>
+          </div>
+        </div>
+        <div id="profileSection">
+          <div id="profileDefault" onclick="openFriendSheet()">
+            <div class="profile-avatar">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path d="M12 18H24" stroke="#B7B7B7" stroke-width="2.4"/>
+                <path d="M18 12V24" stroke="#B7B7B7" stroke-width="2.4"/>
+              </svg>
+            </div>
+            <p class="profile-text">Select a friend to<br>send a gift to</p>
+          </div>
+          <div id="profileSelected" onclick="openFriendSheet()">
+            <div class="profile-avatar" id="selectedAvatar"></div>
+            <p class="profile-name-text" id="selectedName"></p>
+            <button class="change-btn">Change</button>
+          </div>
+        </div>
+        <div id="priceSections"></div>
+      </div>
+
+      <!-- 친구 선택 뷰 (헤더 없음 → 공유 헤더 사용) -->
+      <div class="friend-sheet" id="friendSheet">
+        <div class="search-wrap">
+          <div class="search-bar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" placeholder="이름 검색" id="searchInput" oninput="filterFriends(this.value)">
+          </div>
+        </div>
+        <div class="friend-list" id="friendList"></div>
+        <div class="select-btn-wrap" id="selectBtnWrap">
+          <button class="select-btn" id="selectBtn" onclick="confirmFriend()">친구 선택</button>
+          <div class="select-btn-indicator"></div>
+        </div>
+      </div>
+
+    </div><!-- /#viewContainer -->
+  </div><!-- /#sheet -->
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script>
+    // ── 언어 감지 & 멘션 파라미터 ────────────────────────────────────────
+    // liff.init() 전에는 liff.state로 감싸진 상태 → init 완료 후 재파싱
+    let _lp = new URLSearchParams(window.location.search);
+    let lang = ['ko', 'en', 'zh', 'th'].includes(_lp.get('lang')) ? _lp.get('lang') : 'en';
+    let mentionUid = _lp.get('mention') || '';
+
+    // ── 다국어 텍스트 ─────────────────────────────────────────────────────
+    const LANG_TEXT = {
+      ko: {
+        header:            '생일 선물',
+        profileDefault:    '선물을 받을 친구를<br>선택해주세요',
+        headerFriend:      '친구 선택',
+        searchPlaceholder: '이름 검색',
+        giftFor:           '생일 선물 받을',
+        changeBtn:         '변경',
+        selectBtnPrefix:   '',
+        selectBtnSuffix:   ' 선택',
+        currencyPrefix:    '',
+        currencySuffix:    '원',
+      },
+      en: {
+        header:            'Birthday Gift',
+        profileDefault:    'Select a friend to<br>send a gift to',
+        headerFriend:      'Select Friend',
+        searchPlaceholder: 'Search by name',
+        giftFor:           'Birthday gift for',
+        changeBtn:         'Change',
+        selectBtnPrefix:   'Select ',
+        selectBtnSuffix:   '',
+        currencyPrefix:    '$',
+        currencySuffix:    '',
+      },
+      zh: {
+        header:            '生日禮物',
+        profileDefault:    '請選擇要送禮的朋友',
+        headerFriend:      '選擇朋友',
+        searchPlaceholder: '搜尋名稱',
+        giftFor:           '生日禮物送給',
+        changeBtn:         '更換好友',
+        selectBtnPrefix:   '選擇 ',
+        selectBtnSuffix:   '',
+        currencyPrefix:    '$',
+        currencySuffix:    '',
+      },
+      th: {
+        header:            'ของขวัญวันเกิด',
+        profileDefault:    'เลือกเพื่อนที่จะ<br>ส่งของขวัญให้',
+        headerFriend:      'เลือกเพื่อน',
+        searchPlaceholder: 'ค้นหาชื่อ',
+        giftFor:           'ของขวัญวันเกิดสำหรับ',
+        changeBtn:         'เปลี่ยน',
+        selectBtnPrefix:   'เลือก ',
+        selectBtnSuffix:   '',
+        currencyPrefix:    '฿',
+        currencySuffix:    '',
+      },
+    };
+    let T = LANG_TEXT[lang];
+
+    // ── 가격 섹션 데이터 (다국어) ──────────────────────────────────────────
+    const SECTIONS_I18N = {
+      ko: [
+        { key: 's1', title: '$600 이하 생일 선물',           tabs: ['케이크 & 디저트', '커피 & 음료', '뷰티 & 케어', '상품권', '라이프스타일'] },
+        { key: 's2', title: '$600 \u2013 $1,200 생일 선물',  tabs: ['프리미엄 세트', '향수 & 바디', '고급 디저트', '라이프스타일', '액세서리'] },
+        { key: 's3', title: '$1,200 \u2013 $2,000 생일 선물',tabs: ['커스텀 뷰티', '주얼리 & 가방', '테크 & 리빙'] },
+        { key: 's4', title: '$2,000+ 생일 선물',             tabs: ['럭셔리 향수', '프리미엄 헬스', '파인 다이닝'] },
+      ],
+      en: [
+        { key: 's1', title: 'Under $600 Birthday Gift',          tabs: ['Cake & Dessert', 'Coffee & Drinks', 'Beauty & Care', 'Money Voucher', 'Lifestyle'] },
+        { key: 's2', title: '$600 \u2013 $1,200 Birthday Gift',   tabs: ['Exclusive Sets', 'Fragrance & Body', 'Premium Sweets', 'Lifestyle', 'Accessories'] },
+        { key: 's3', title: '$1,200 \u2013 $2,000 Birthday Gift', tabs: ['Customized Beauty', 'Jewelry & Bags', 'Tech & Living'] },
+        { key: 's4', title: '$2,000+ Birthday Gift',              tabs: ['Luxury Fragrance', 'Premium Health', 'Fine Dining'] },
+      ],
+      zh: [
+        { key: 's1', title: '$600 以下生日禮物',              tabs: ['蛋糕 & 甜點', '咖啡 & 飲料', '美妝 & 保養', '禮品券', '生活風格'] },
+        { key: 's2', title: '$600 \u2013 $1,200 生日禮物',    tabs: ['精選套裝', '香氛 & 沐浴', '精品甜點', '生活風格', '飾品'] },
+        { key: 's3', title: '$1,200 \u2013 $2,000 生日禮物',  tabs: ['客製美妝', '珠寶 & 包包', '科技 & 生活'] },
+        { key: 's4', title: '$2,000+ 生日禮物',               tabs: ['頂級香氛', '精品健康', '精緻餐飲'] },
+      ],
+      th: [
+        { key: 's1', title: 'ของขวัญวันเกิดต่ำกว่า $600',        tabs: ['เค้ก & ของหวาน', 'กาแฟ & เครื่องดื่ม', 'บิวตี้ & ดูแลผิว', 'บัตรกำนัล', 'ไลฟ์สไตล์'] },
+        { key: 's2', title: 'ของขวัญวันเกิด $600 \u2013 $1,200',  tabs: ['ชุดพิเศษ', 'น้ำหอม & บอดี้', 'ของหวานพรีเมียม', 'ไลฟ์สไตล์', 'เครื่องประดับ'] },
+        { key: 's3', title: 'ของขวัญวันเกิด $1,200 \u2013 $2,000',tabs: ['บิวตี้สั่งทำ', 'เครื่องประดับ & กระเป๋า', 'เทค & ของแต่งบ้าน'] },
+        { key: 's4', title: 'ของขวัญวันเกิดมากกว่า $2,000',       tabs: ['น้ำหอมหรู', 'สุขภาพพรีเมียม', 'ไฟน์ไดนิ่ง'] },
+      ],
+    };
+    let sections = SECTIONS_I18N[lang];
+
+    const products = [
+      { brand: 'AVEDA',         name: '우드 헤어 브러쉬',     price: '$120', img: '' },
+      { brand: 'Starbucks',     name: '텀블러 세트',           price: '$180', img: '' },
+      { brand: 'Godiva',        name: '초콜릿 선물 세트',      price: '$350', img: '' },
+      { brand: 'LUSH',          name: '바스 밤 세트',           price: '$220', img: '' },
+      { brand: 'Origins',       name: '페이셜 마스크 세트',    price: '$280', img: '' },
+      { brand: "Kiehl's",       name: '립 밤 콜렉션',          price: '$300', img: '' },
+      { brand: "L'Occitane",    name: '핸드 크림 세트',        price: '$450', img: '' },
+      { brand: 'The Body Shop', name: '바디 버터 세트',         price: '$200', img: '' },
+    ];
+
+    const friendData = [
+      { name: 'Emma Johnson',   emoji: '😊' },
+      { name: 'Oliver Smith',   emoji: '😎' },
+      { name: 'Ava Brown',      emoji: '🌸' },
+      { name: 'Liam Davis',     emoji: '🎯' },
+      { name: 'Sophia Wilson',  emoji: '✨' },
+      { name: 'Noah Taylor',    emoji: '🎮' },
+      { name: 'Isabella Moore', emoji: '🎀' },
+      { name: 'Ethan Jackson',  emoji: '🏄' },
+    ];
+
+    let isGroup = false;
+    let selectedFriend = null;
+    let currentUserId = null;
+    let isFriendView = false;  // 현재 뷰 상태
+
+    // ── 헤더 공유 로직 ─────────────────────────────────────────────────
+    // isFriendView = true  → "Select Friend" + X(closeFriendSheet)
+    // isFriendView = false → "Birthday Gift"  + X(liff.closeWindow)
+    function headerBtnAction() {
+      if (isFriendView) {
+        closeFriendSheet();
+      } else {
+        liff.closeWindow();
+      }
+    }
+
+    function setHeaderGift() {
+      document.getElementById('headerTitle').textContent = T.header;
+      isFriendView = false;
+    }
+
+    function setHeaderFriend() {
+      document.getElementById('headerTitle').textContent = T.headerFriend;
+      isFriendView = true;
+    }
+
+    // ── 가격 포맷 ────────────────────────────────────────────────────────
+    function formatPrice(price) {
+      const num = price.replace(/[^0-9.]/g, '');
+      const formatted = Number(num).toLocaleString('en-US');
+      return T.currencyPrefix + formatted + T.currencySuffix;
+    }
+
+    // ── 카드 HTML ───────────────────────────────────────────────────────
+    function cardHTML(p) {
+      return `
+        <div class="card">
+          <div class="card-img-wrap">
+            ${p.img ? `<img src="${p.img}" alt="${p.name}">` : ''}
+          </div>
+          <div class="card-info">
+            <p class="card-brand">${p.brand}</p>
+            <p class="card-name">${p.name}</p>
+            <p class="card-price">${formatPrice(p.price)}</p>
+          </div>
+        </div>`;
+    }
+
+    // ── 섹션 렌더링 ─────────────────────────────────────────────────────
+    function renderSections() {
+      const row1 = products.map(cardHTML).join('');
+      const row2 = [...products].reverse().map(cardHTML).join('');
+      const carousel = `
+        <div class="carousel-outer">
+          <div class="carousel-rows">
+            <div class="carousel-row">${row1}</div>
+            <div class="carousel-row">${row2}</div>
+          </div>
+        </div>`;
+
+      document.getElementById('priceSections').innerHTML = sections.map(s => `
+        <div class="price-section">
+          <p class="section-title">${s.title}</p>
+          <div class="tab-scroll">
+            <div class="tab-bar">
+              ${s.tabs.map((t, i) => `
+                <button class="tab-btn ${i === 0 ? 'active' : ''}" onclick="switchTab(this)">${t}</button>
+              `).join('')}
+            </div>
+          </div>
+          ${carousel}
+        </div>
+      `).join('');
+    }
+
+    function switchTab(btn) {
+      btn.closest('.price-section').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // ── 이름 말줄임 ──────────────────────────────────────────────────────
+    function truncateName(name) {
+      return name.length > 10 ? name.slice(0, 10) + '…' : name;
+    }
+
+    // ── LINE 기본 프로필 이미지 (이름 해시 → 항상 같은 색상 배정) ────
+    function getDefaultAvatar(name) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = (hash + name.charCodeAt(i)) % 4;
+      return `/static/images/profile_default_${hash}.svg`;
+    }
+
+    // ── 선택된 친구 프로필 UI 업데이트 ───────────────────────────────────
+    function showSelectedProfile(friend) {
+      const avatarEl = document.getElementById('selectedAvatar');
+      avatarEl.innerHTML = `<img src="${friend.img || getDefaultAvatar(friend.name)}" alt="${friend.name}">`;
+      document.getElementById('selectedName').innerHTML = `${T.giftFor}<br>${truncateName(friend.name)}`;
+      document.getElementById('profileDefault').style.display = 'none';
+      document.getElementById('profileSelected').style.display = 'flex';
+    }
+
+    // ── 친구 모달 ──────────────────────────────────────────────────────
+    function renderFriendList(list) {
+      document.getElementById('friendList').innerHTML = list.map(f => {
+        const isSelected = selectedFriend === f.name;
+        const src = f.img || getDefaultAvatar(f.name);
+        return `
+          <div class="friend-item" onclick="selectFriend('${f.name}')">
+            <div class="friend-avatar"><img src="${src}" alt="${f.name}"></div>
+            <span class="friend-name">${f.name}</span>
+            <div class="radio-btn${isSelected ? ' selected' : ''}">
+              <div class="radio-dot"></div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function loadGroupMembers(ctx) {
+      const roomId = _lp.get('gid') || ctx.groupId || ctx.roomId;
+      const roomType = ctx.type;
+      try {
+        const resp = await fetch('/api/group-members?roomId=' + encodeURIComponent(roomId) + '&roomType=' + encodeURIComponent(roomType));
+        const data = await resp.json();
+        if (data.members && data.members.length > 0) {
+          const filtered = data.members.filter(m => m.userId !== currentUserId);
+          friendData.splice(0, friendData.length, ...filtered);
+        }
+      } catch (e) {
+        console.warn('Failed to load group members:', e);
+      }
+      renderFriendList(friendData);
+
+      // 멘션된 친구 자동 선택 후 스켈레톤 → 프로필 교체
+      if (mentionUid) {
+        const mentioned = friendData.find(f => f.userId === mentionUid);
+        if (mentioned) autoSelectFriend(mentioned);
+        document.getElementById('profileSkeleton').style.display = 'none';
+        document.getElementById('profileSection').style.display = 'block';
+      }
+    }
+
+    function openFriendSheet() {
+      if (!isGroup) return;
+      document.querySelector('.content').classList.add('hidden');
+      document.getElementById('friendSheet').classList.add('show');
+      setHeaderFriend();
+    }
+
+    function closeFriendSheet() {
+      document.getElementById('friendSheet').classList.remove('show');
+      document.querySelector('.content').classList.remove('hidden');
+      document.getElementById('searchInput').value = '';
+      selectedFriend = null;
+      document.getElementById('selectBtnWrap').classList.remove('show');
+      renderFriendList(friendData);
+      setHeaderGift();
+    }
+
+    function filterFriends(q) {
+      renderFriendList(friendData.filter(f => f.name.toLowerCase().includes(q.toLowerCase())));
+    }
+
+    function selectFriend(name) {
+      selectedFriend = selectedFriend === name ? null : name;
+      const q = document.getElementById('searchInput').value;
+      renderFriendList(friendData.filter(f =>
+        q ? f.name.toLowerCase().includes(q.toLowerCase()) : true
+      ));
+      const wrap = document.getElementById('selectBtnWrap');
+      if (selectedFriend) {
+          document.getElementById('selectBtn').textContent = T.selectBtnPrefix + truncateName(selectedFriend) + T.selectBtnSuffix;
+        wrap.classList.add('show');
+      } else {
+        wrap.classList.remove('show');
+      }
+    }
+
+    // ── 멘션 친구 자동 선택 (friend sheet 열지 않고 프로필 바로 표시) ──
+    function autoSelectFriend(friend) {
+      selectedFriend = friend.name;
+      showSelectedProfile(friend);
+    }
+
+    function confirmFriend() {
+      if (!selectedFriend) return;
+      const friend = friendData.find(f => f.name === selectedFriend);
+      if (friend) showSelectedProfile(friend);
+      closeFriendSheet();
+    }
+
+    // ── 상품 데이터 로드 (top16.json) ────────────────────────────────────
+    async function loadProducts() {
+      try {
+        const res = await fetch('/static/data/top16.json');
+        const data = await res.json();
+        if (data.products && data.products.length) {
+          products.splice(0, products.length, ...data.products);
+        }
+      } catch (e) {
+        console.warn('products load failed, using placeholder', e);
+      }
+    }
+
+    // ── LIFF 초기화 ─────────────────────────────────────────────────────
+    async function init() {
+      let ctx = null;
+      try {
+        await liff.init({ liffId: '{{ liff_id }}' });
+        // liff.init 완료 후 location이 실제 URL로 업데이트됨 → 재파싱
+        _lp = new URLSearchParams(window.location.search);
+        lang = ['ko', 'en', 'zh', 'th'].includes(_lp.get('lang')) ? _lp.get('lang') : 'en';
+        mentionUid = _lp.get('mention') || '';
+        T = LANG_TEXT[lang];
+        sections = SECTIONS_I18N[lang];
+        applyLang();
+        ctx = liff.getContext();
+        isGroup = ctx?.type === 'group' || ctx?.type === 'room';
+      } catch (e) {
+        console.warn('LIFF init:', e);
+      }
+      if (!isGroup) {
+        if (_lp.get('gid')) isGroup = true;
+      }
+
+      if (!isGroup) {
+        document.getElementById('profileSection').style.display = 'none';
+      }
+
+      await loadProducts();
+      renderSections();
+
+      if (isGroup && ctx) {
+        try {
+          const profile = await liff.getProfile();
+          currentUserId = profile.userId;
+          const gid = _lp.get('gid') || ctx.groupId || ctx.roomId;
+          if (gid) {
+            fetch('/api/register-member', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ roomId: gid, userId: profile.userId, name: profile.displayName, img: profile.pictureUrl || '' })
+            }).catch(() => {});
+          }
+        } catch (e) { console.warn('profile:', e); }
+        await loadGroupMembers(ctx);
+      } else {
+        renderFriendList(friendData);
+      }
+    }
+
+    // ── 언어 적용 ─────────────────────────────────────────────────────────
+    function applyLang() {
+      document.getElementById('headerTitle').textContent = T.header;
+      document.querySelector('#profileDefault .profile-text').innerHTML = T.profileDefault;
+      document.getElementById('searchInput').placeholder = T.searchPlaceholder;
+      document.querySelector('.change-btn').textContent = T.changeBtn;
+    }
+
+    applyLang();
+    init();
+  </script>
+</body>
+</html>
